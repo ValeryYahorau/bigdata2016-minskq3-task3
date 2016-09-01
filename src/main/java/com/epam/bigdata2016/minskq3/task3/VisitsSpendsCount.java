@@ -28,9 +28,11 @@ public class VisitsSpendsCount {
             String[] params = line.split("\\s+");
 
             String ip = params[4];
+            System.out.println("Step1 ip : " + ip);
             ipText.set(ip);
 
             int bp = Integer.getInteger(params[params.length - 3]);
+            System.out.println("Step2 bp : " + bp);
             vsc.setSpendsCount(bp);
             vsc.setVisitsCount(1);
 
