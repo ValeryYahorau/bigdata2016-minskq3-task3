@@ -42,18 +42,13 @@ public class TagsCount {
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
-            String inputText = value.toString();
-            System.out.println("Step0 " + inputText);
-            String[] lines = inputText.split("\\n");
-            System.out.println("Step1 " + inputText);
-            // skip first line because it contains names of parameters
-            for (int i = 1; i < lines.length; i++) {
-                String currentLine = lines[i];
-                System.out.println("Step2 " + currentLine);
-                String[] params = currentLine.split("\\s+");
+            String line = value.toString();
+            if (containsDigit(line)) {
+                System.out.println("Step0 current line : " + line);
+                String[] params = line.split("\\s+");
                 String[] tags = params[1].toUpperCase().split(",");
                 for (String currentTag : tags) {
-                    System.out.println("Step3 " + currentTag);
+                    System.out.println("Step1 " + currentTag);
                     if (!stopWords.contains(currentTag)) {
                         tag.set(currentTag);
                         context.write(tag, one);
@@ -72,6 +67,20 @@ public class TagsCount {
             } catch (IOException ex) {
                 System.err.println("Exception while reading stop words file: " + ex.getMessage());
             }
+        }
+
+        public final boolean containsDigit(String s) {
+            boolean containsDigit = false;
+
+            if (s != null && !s.isEmpty()) {
+                for (char c : s.toCharArray()) {
+                    if (containsDigit = Character.isDigit(c)) {
+                        break;
+                    }
+                }
+            }
+
+            return containsDigit;
         }
     }
 
