@@ -44,11 +44,9 @@ public class TagsCount {
 
             String line = value.toString();
             if (containsDigit(line)) {
-                System.out.println("Step0 current line : " + line);
                 String[] params = line.split("\\s+");
                 String[] tags = params[1].toUpperCase().split(",");
                 for (String currentTag : tags) {
-                    System.out.println("Step1 " + currentTag);
                     if (!stopWords.contains(currentTag)) {
                         tag.set(currentTag);
                         context.write(tag, one);
@@ -103,6 +101,8 @@ public class TagsCount {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test2.txt", "/Users/valeryyegorov/Downloads/test22.txt"};
+
         if (otherArgs.length < 2) {
             System.err.println("Usage: tagscount <in> <out> [<in>...]");
             System.exit(2);
