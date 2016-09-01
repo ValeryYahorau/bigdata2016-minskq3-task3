@@ -43,6 +43,7 @@ public class TagsCount {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
             String inputText = value.toString();
+            System.out.println("Step0 " + inputText);
             String[] lines = inputText.split("\\n");
             System.out.println("Step1 " + inputText);
             // skip first line because it contains names of parameters
