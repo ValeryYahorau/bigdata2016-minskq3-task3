@@ -1,6 +1,5 @@
 package com.epam.bigdata2016.minskq3.task3;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
 
 import java.io.DataInput;
@@ -11,6 +10,14 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
 
     private int visitsCount;
     private int spendsCount;
+
+    public VisitSpendComparable() {
+    }
+
+    public VisitSpendComparable(int visitsCount, int spendsCount) {
+        this.visitsCount = visitsCount;
+        this.spendsCount = spendsCount;
+    }
 
     public void write(DataOutput out) throws IOException {
         out.writeInt(visitsCount);
@@ -45,6 +52,21 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
                 return 0;
             }
         }
+    }
 
+    public int getVisitsCount() {
+        return visitsCount;
+    }
+
+    public void setVisitsCount(int visitsCount) {
+        this.visitsCount = visitsCount;
+    }
+
+    public int getSpendsCount() {
+        return spendsCount;
+    }
+
+    public void setSpendsCount(int spendsCount) {
+        this.spendsCount = spendsCount;
     }
 }

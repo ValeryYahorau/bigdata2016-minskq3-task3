@@ -1,10 +1,6 @@
 package com.epam.bigdata2016.minskq3.task3;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -19,81 +15,42 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class VisitsSpendsCount {
 
-    public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+    public static class VisitsSpendsMapper extends Mapper<Object, Text, Text, VisitSpendComparable> {
 
-        private final static IntWritable one = new IntWritable(1);
-        private Text tag = new Text();
-        private Set<String> stopWords = new HashSet();
-
-        @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
-            try {
-                // get file with stop words from distributed cache
-                Path[] localPaths = context.getLocalCacheFiles();
-                if (localPaths != null && localPaths.length > 0) {
-                    for (Path stopWordFile : localPaths) {
-                        readFile(stopWordFile);
-                    }
-                }
-            } catch (IOException ex) {
-                System.err.println("Exception in mapper setup: " + ex.getMessage());
-            }
-        }
+        private Text ipText = new Text();
+        private VisitSpendComparable vsc = new VisitSpendComparable();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
             String line = value.toString();
-            if (containsDigit(line)) {
-                System.out.println("Step0 current line : " + line);
-                String[] params = line.split("\\s+");
-                String[] tags = params[1].toUpperCase().split(",");
-                for (String currentTag : tags) {
-                    System.out.println("Step1 " + currentTag);
-                    if (!stopWords.contains(currentTag)) {
-                        tag.set(currentTag);
-                        context.write(tag, one);
-                    }
-                }
-            }
-        }
 
-        private void readFile(Path filePath) {
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath.toString()));
-                String stopWord = null;
-                while ((stopWord = bufferedReader.readLine()) != null) {
-                    stopWords.add(stopWord.toUpperCase());
-                }
-            } catch (IOException ex) {
-                System.err.println("Exception while reading stop words file: " + ex.getMessage());
-            }
-        }
+            System.out.println("Step0 current line : " + line);
+            String[] params = line.split("\\s+");
 
-        public final boolean containsDigit(String s) {
-            boolean containsDigit = false;
+            String ip = params[4];
+            ipText.set(ip);
 
-            if (s != null && !s.isEmpty()) {
-                for (char c : s.toCharArray()) {
-                    if (containsDigit = Character.isDigit(c)) {
-                        break;
-                    }
-                }
-            }
+            int bp = Integer.getInteger(params[params.length - 3]);
+            vsc.setSpendsCount(bp);
+            vsc.setVisitsCount(1);
 
-            return containsDigit;
+            context.write(ipText, vsc);
         }
     }
 
 
-    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-        private IntWritable result = new IntWritable();
+    public static class IntSumReducer extends Reducer<Text, IntWritable, Text, VisitSpendComparable> {
+        private VisitSpendComparable result = new VisitSpendComparable();
 
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum += val.get();
+        public void reduce(Text key, Iterable<VisitSpendComparable> values, Context context) throws IOException, InterruptedException {
+            int visitCount = 0;
+            int sumbidPrice = 0;
+            for (VisitSpendComparable val : values) {
+                visitCount += val.getVisitsCount();
+                sumbidPrice += val.getSpendsCount();
             }
-            result.set(sum);
+            result.setVisitsCount(visitCount);
+            result.setSpendsCount(sumbidPrice);
             context.write(key, result);
         }
 
@@ -109,7 +66,7 @@ public class VisitsSpendsCount {
         }
         Job job = new Job(conf, "Visits Spends count");
         job.setJarByClass(TagsCount.class);
-        job.setMapperClass(TokenizerMapper.class);
+        job.setMapperClass(VisitsSpendsMapper.class);
 
         // for current task Combiner is the same like Reducer
         // take a look at http://www.tutorialspoint.com/map_reduce/map_reduce_combiners.htm
