@@ -1,8 +1,6 @@
 package com.epam.bigdata2016.minskq3.task3;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -27,13 +25,13 @@ public class TagsCount {
             String inputText = value.toString();
             String[] lines = inputText.split("\\n");
 
-            //skip first line because it contains names of parameters
+            // skip first line because it contains names of parameters
             for (int i = 1; i < lines.length; i++) {
 
                 String currentLine = lines[i];
                 String[] params = currentLine.split("\\s+");
-                String[] tags = params[1].split(",");
-                for (String currentTag : tags){
+                String[] tags = params[1].toUpperCase().split(",");
+                for (String currentTag : tags) {
                     tag.set(currentTag);
                     context.write(tag, one);
                 }
@@ -65,12 +63,18 @@ public class TagsCount {
         Job job = new Job(conf, "Tags count");
         job.setJarByClass(TagsCount.class);
         job.setMapperClass(TokenizerMapper.class);
+
+        // for current task Combiner is the same like Reducer
+        // take a look at http://www.tutorialspoint.com/map_reduce/map_reduce_combiners.htm
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         for (int i = 0; i < otherArgs.length - 1; ++i) {
             FileInputFormat.addInputPath(job, new Path(otherArgs[i]));
+
+            // put input file to distributed cache
+            job.addCacheFile(new Path(otherArgs[i]).toUri());
         }
         FileOutputFormat.setOutputPath(job,
                 new Path(otherArgs[otherArgs.length - 1]));
