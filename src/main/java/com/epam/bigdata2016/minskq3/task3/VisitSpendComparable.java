@@ -69,4 +69,12 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
     public void setSpendsCount(int spendsCount) {
         this.spendsCount = spendsCount;
     }
+
+    @Override
+    public String toString() {
+        return "VisitSpendComparable{" +
+                "visitsCount=" + visitsCount +
+                ", spendsCount=" + spendsCount +
+                '}';
+    }
 }
