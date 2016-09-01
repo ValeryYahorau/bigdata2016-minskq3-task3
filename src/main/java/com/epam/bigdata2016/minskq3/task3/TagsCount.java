@@ -1,6 +1,10 @@
 package com.epam.bigdata2016.minskq3.task3;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -19,6 +23,22 @@ public class TagsCount {
 
         private final static IntWritable one = new IntWritable(1);
         private Text tag = new Text();
+        private Set<String> stopWords = new HashSet();
+
+        @Override
+        protected void setup(Context context) throws IOException, InterruptedException {
+            try {
+                // get file with stop words from distributed cache
+                Path[] localPaths = context.getLocalCacheFiles();
+                if (localPaths != null && localPaths.length > 0) {
+                    for (Path stopWordFile : localPaths) {
+                        readFile(stopWordFile);
+                    }
+                }
+            } catch (IOException ex) {
+                System.err.println("Exception in mapper setup: " + ex.getMessage());
+            }
+        }
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
@@ -32,12 +52,27 @@ public class TagsCount {
                 String[] params = currentLine.split("\\s+");
                 String[] tags = params[1].toUpperCase().split(",");
                 for (String currentTag : tags) {
-                    tag.set(currentTag);
-                    context.write(tag, one);
+                    if (!stopWords.contains(currentTag)) {
+                        tag.set(currentTag);
+                        context.write(tag, one);
+                    }
                 }
             }
         }
+
+        private void readFile(Path filePath) {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath.toString()));
+                String stopWord = null;
+                while ((stopWord = bufferedReader.readLine()) != null) {
+                    stopWords.add(stopWord.toUpperCase());
+                }
+            } catch (IOException ex) {
+                System.err.println("Exception while reading stop words file: " + ex.getMessage());
+            }
+        }
     }
+
 
     public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
@@ -50,6 +85,7 @@ public class TagsCount {
             result.set(sum);
             context.write(key, result);
         }
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -72,9 +108,10 @@ public class TagsCount {
         job.setOutputValueClass(IntWritable.class);
         for (int i = 0; i < otherArgs.length - 1; ++i) {
             FileInputFormat.addInputPath(job, new Path(otherArgs[i]));
-
-            // put input file to distributed cache
-            job.addCacheFile(new Path(otherArgs[i]).toUri());
+        }
+        if (otherArgs.length > 2) {
+            // put input file with stop words to distributed cache
+            job.addCacheFile(new Path(otherArgs[2]).toUri());
         }
         FileOutputFormat.setOutputPath(job,
                 new Path(otherArgs[otherArgs.length - 1]));
