@@ -17,7 +17,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-public class TagsCount {
+public class VisitsSpendsCount {
 
     public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
 
@@ -104,10 +104,10 @@ public class TagsCount {
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
         if (otherArgs.length < 2) {
-            System.err.println("Usage: tagscount <in> <out> [<in>...]");
+            System.err.println("Usage: VisitsSpendsCount <in> <out>");
             System.exit(2);
         }
-        Job job = new Job(conf, "Tags count");
+        Job job = new Job(conf, "Visits Spends count");
         job.setJarByClass(TagsCount.class);
         job.setMapperClass(TokenizerMapper.class);
 
@@ -120,10 +120,6 @@ public class TagsCount {
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
-        if (otherArgs.length > 2) {
-            // put input file with stop words to distributed cache
-            job.addCacheFile(new Path(otherArgs[2]).toUri());
-        }
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
