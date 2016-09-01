@@ -44,14 +44,15 @@ public class TagsCount {
 
             String inputText = value.toString();
             String[] lines = inputText.split("\\n");
-
+            System.out.println("Step1 " + inputText);
             // skip first line because it contains names of parameters
             for (int i = 1; i < lines.length; i++) {
-
                 String currentLine = lines[i];
+                System.out.println("Step2 " + currentLine);
                 String[] params = currentLine.split("\\s+");
                 String[] tags = params[1].toUpperCase().split(",");
                 for (String currentTag : tags) {
+                    System.out.println("Step3 " + currentTag);
                     if (!stopWords.contains(currentTag)) {
                         tag.set(currentTag);
                         context.write(tag, one);
@@ -106,15 +107,13 @@ public class TagsCount {
         job.setReducerClass(IntSumReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
-        for (int i = 0; i < otherArgs.length - 1; ++i) {
-            FileInputFormat.addInputPath(job, new Path(otherArgs[i]));
-        }
+        FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
+        FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+
         if (otherArgs.length > 2) {
             // put input file with stop words to distributed cache
             job.addCacheFile(new Path(otherArgs[2]).toUri());
         }
-        FileOutputFormat.setOutputPath(job,
-                new Path(otherArgs[otherArgs.length - 1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
