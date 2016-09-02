@@ -58,4 +58,23 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
         return "Visits count : " + visitsCount +
                 ", Bidding price sum : " + spendsCount;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VisitSpendComparable that = (VisitSpendComparable) o;
+
+        if (getVisitsCount() != that.getVisitsCount()) return false;
+        return getSpendsCount() == that.getSpendsCount();
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getVisitsCount();
+        result = 31 * result + getSpendsCount();
+        return result;
+    }
 }

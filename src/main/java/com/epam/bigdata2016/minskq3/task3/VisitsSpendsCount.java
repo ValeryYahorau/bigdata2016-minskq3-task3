@@ -31,7 +31,7 @@ public class VisitsSpendsCount {
             if (m.find()) {
                 String ip = m.group().trim();
                 ipText.set(ip);
-                Integer bp = Integer.parseInt(params[params.length - 3]);
+                Integer bp = Integer.parseInt(params[params.length - 4]);
 
                 vsc.setSpendsCount(bp.intValue());
                 vsc.setVisitsCount(1);
