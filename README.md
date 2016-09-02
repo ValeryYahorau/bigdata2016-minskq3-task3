@@ -35,5 +35,8 @@ yarn jar /root/Documents/bigdata2016-minskq3-task3/target/bigdata2016-minskq3-ta
 ###Notes
 - Was used distributed cache for optional input for stop/bad words in tags count job.
 - Was used output as Sequence file with Snappy compression for output in visits spends count job.
+- Was implememnted custom implementation of WritableComparable `VisitSpendComparable` for visits spends count job.
 - For parsing User Agent was used [https://github.com/HaraldWalker/user-agent-utils](https://github.com/HaraldWalker/user-agent-utils).
 - Unit tests for both jobs were implemeted.
+- Also its possible to run jobs and unit tests like simple java applications.
+
