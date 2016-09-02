@@ -30,27 +30,10 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
     }
 
     public int compareTo(VisitSpendComparable w) {
-        if (visitsCount > w.visitsCount)
-        {
-            return 1;
-        }
-        else if (visitsCount < w.visitsCount)
-        {
-            return -1;
-        }
-        else {
-            if (spendsCount > w.spendsCount)
-            {
-                return 1;
-            }
-            else if (spendsCount < w.spendsCount)
-            {
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
+        if (Integer.compare(visitsCount,w.getVisitsCount()) == 0 ) {
+            return Integer.compare(spendsCount,w.getSpendsCount());
+        } else {
+            return Integer.compare(visitsCount,w.getVisitsCount());
         }
     }
 
@@ -73,7 +56,6 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
     @Override
     public String toString() {
         return "Visits count : " + visitsCount +
-                ", Spends count : " + spendsCount +
-                '}';
+                ", Bidding price sum : " + spendsCount;
     }
 }
