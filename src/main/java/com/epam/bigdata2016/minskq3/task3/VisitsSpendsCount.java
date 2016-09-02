@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
@@ -20,14 +19,14 @@ public class VisitsSpendsCount {
 
         private Text ipText = new Text();
         private VisitSpendComparable vsc = new VisitSpendComparable();
+        Pattern pIp = Pattern.compile("\\s\\d+\\.\\d+\\.\\d+\\.(\\d+|\\*)\\s");
+        Pattern pUserAgent = Pattern.compile("[a-zA-Z0-9]+\\s[0-9]+\\s[a-zA-Z0-9]+\\s(.*)");
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
             String line = value.toString();
             String[] params = line.split("\\s+");
-
-            Pattern p = Pattern.compile("\\s\\d+\\.\\d+\\.\\d+\\.(\\d+|\\*)\\s");
-            Matcher m = p.matcher(line);
+            Matcher m = pIp.matcher(line);
             if (m.find()) {
                 String ip = m.group().trim();
                 ipText.set(ip);
@@ -36,6 +35,31 @@ public class VisitsSpendsCount {
                 vsc.setSpendsCount(bp.intValue());
                 vsc.setVisitsCount(1);
                 context.write(ipText, vsc);
+
+                String firstParams = line.split(ip)[0].trim();
+
+                Matcher m2 = pUserAgent.matcher(firstParams);
+                if (m2.find()) {
+                    String userAgent = m2.group(1);
+                    UserAgent ua = new UserAgent(userAgent);
+                    String br = ua.getBrowser().getName();
+                    System.out.println("User Agent " + br);
+
+                    context.getCounter(ua.getBrowser()).increment(1);
+
+                }
+            }
+        }
+
+        public static void increaseCounter(String line, Context context) {
+            if (line.toLowerCase().contains("opera")) {
+
+            } else if (line.toLowerCase().contains("mozilla")) {
+
+            } else if (line.toLowerCase().contains("msie")) {
+
+            } else if (line.toLowerCase().contains("opera")) {
+
             }
         }
     }
@@ -66,7 +90,7 @@ public class VisitsSpendsCount {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test.txt", "/Users/valeryyegorov/Downloads/test3.txt"};
+        otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test.txt", "/Users/valeryyegorov/Downloads/test3.txt"};
 
         if (otherArgs.length < 2) {
             System.err.println("Usage: VisitsSpendsCount <in> <out>");
