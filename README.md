@@ -16,7 +16,7 @@ yarn jar ~/bigdata2016-minskq3-task3/target/bigdata2016-minskq3-task3-1.0.0-jar-
 Where 
 `in` - path to input file,
 `out` - path for output,
-`inoptional` - optional parameter, path to file with stop/bad words.
+`inoptional` - optional parameter, path to file with stop/bad words (1 word in 1 line).
 e.g. 
 yarn jar /root/Documents/bigdata2016-minskq3-task3/target/bigdata2016-minskq3-task3-1.0.0-jar-with-dependencies.jar com.epam.bigdata2016.minskq3.task3.TagsCount /tmp/admin/in1.txt /tmp/admin/ou1.txt 
 
