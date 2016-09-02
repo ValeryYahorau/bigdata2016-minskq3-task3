@@ -50,18 +50,6 @@ public class VisitsSpendsCount {
                 }
             }
         }
-
-        public static void increaseCounter(String line, Context context) {
-            if (line.toLowerCase().contains("opera")) {
-
-            } else if (line.toLowerCase().contains("mozilla")) {
-
-            } else if (line.toLowerCase().contains("msie")) {
-
-            } else if (line.toLowerCase().contains("opera")) {
-
-            }
-        }
     }
 
 
