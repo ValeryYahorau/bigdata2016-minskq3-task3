@@ -70,7 +70,7 @@ public class TagsCount {
             }
         }
 
-        public final boolean containsDigit(String s) {
+        private boolean containsDigit(String s) {
             boolean containsDigit = false;
 
             if (s != null && !s.isEmpty()) {
