@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -43,7 +44,6 @@ public class VisitsSpendsCount {
                     String userAgent = m2.group(1);
                     UserAgent ua = new UserAgent(userAgent);
                     String br = ua.getBrowser().getName();
-                    System.out.println("User Agent " + br);
 
                     context.getCounter(ua.getBrowser()).increment(1);
 
@@ -90,7 +90,7 @@ public class VisitsSpendsCount {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test.txt", "/Users/valeryyegorov/Downloads/test3.txt"};
+        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test.txt", "/Users/valeryyegorov/Downloads/test3.txt"};
 
         if (otherArgs.length < 2) {
             System.err.println("Usage: VisitsSpendsCount <in> <out>");
@@ -111,6 +111,13 @@ public class VisitsSpendsCount {
         FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
         SequenceFileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        boolean result = job.waitForCompletion(true);
+
+        System.out.println("Browsers Counter :");
+        for (Counter counter : job.getCounters().getGroup(Browser.class.getCanonicalName())) {
+            System.out.println(" - " + counter.getDisplayName() + ": " + counter.getValue());
+        }
+
+        System.exit(result ? 0 : 1);
     }
 }
