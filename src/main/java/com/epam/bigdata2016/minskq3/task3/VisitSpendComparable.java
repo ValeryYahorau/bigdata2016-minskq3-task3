@@ -55,8 +55,7 @@ public class VisitSpendComparable implements WritableComparable<VisitSpendCompar
 
     @Override
     public String toString() {
-        return "Visits count : " + visitsCount +
-                ", Bidding price sum : " + spendsCount;
+        return "Visits count : " + visitsCount + ", Bidding price sum : " + spendsCount;
     }
 
     @Override

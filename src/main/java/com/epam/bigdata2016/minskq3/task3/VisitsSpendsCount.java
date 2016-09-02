@@ -23,7 +23,9 @@ public class VisitsSpendsCount {
 
         private Text ipText = new Text();
         private VisitSpendComparable vsc = new VisitSpendComparable();
+        // regex for ip
         Pattern pIp = Pattern.compile("\\s\\d+\\.\\d+\\.\\d+\\.(\\d+|\\*)\\s");
+        // regex for first 3 params and then User Agent
         Pattern pUserAgent = Pattern.compile("[a-zA-Z0-9]+\\s[0-9]+\\s[a-zA-Z0-9]+\\s(.*)");
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -46,8 +48,7 @@ public class VisitsSpendsCount {
                 if (m2.find()) {
                     String userAgent = m2.group(1);
                     UserAgent ua = new UserAgent(userAgent);
-                    String br = ua.getBrowser().getName();
-
+                    // increment counter
                     context.getCounter(ua.getBrowser()).increment(1);
 
                 }
@@ -55,33 +56,27 @@ public class VisitsSpendsCount {
         }
     }
 
-
     public static class VisitsSpendsReducer extends Reducer<Text, VisitSpendComparable, Text, VisitSpendComparable> {
         private VisitSpendComparable result = new VisitSpendComparable();
 
-        public void reduce(Text key, Iterable<VisitSpendComparable> values, Context context)  {
-            try {
-                int visitCount = 0;
-                int sumbidPrice = 0;
-                for (VisitSpendComparable val : values) {
-                    visitCount += val.getVisitsCount();
-                    sumbidPrice += val.getSpendsCount();
-                }
-                result.setVisitsCount(visitCount);
-                result.setSpendsCount(sumbidPrice);
-                context.write(key, result);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
+        public void reduce(Text key, Iterable<VisitSpendComparable> values, Context context) throws IOException, InterruptedException {
+            int visitCount = 0;
+            int sumbidPrice = 0;
+            for (VisitSpendComparable val : values) {
+                visitCount += val.getVisitsCount();
+                sumbidPrice += val.getSpendsCount();
             }
+            result.setVisitsCount(visitCount);
+            result.setSpendsCount(sumbidPrice);
+            context.write(key, result);
         }
-
     }
 
     public static void main(String[] args) throws Exception {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test.txt", "/Users/valeryyegorov/Downloads/test3.txt"};
+        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/testin2.txt", "/Users/valeryyegorov/Downloads/testout2.txt"};
 
         if (otherArgs.length < 2) {
             System.err.println("Usage: VisitsSpendsCount <in> <out>");
@@ -98,6 +93,7 @@ public class VisitsSpendsCount {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(VisitSpendComparable.class);
 
+        // compression with Snappy
         FileOutputFormat.setCompressOutput(job, true);
         FileOutputFormat.setOutputCompressorClass(job, SnappyCodec.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);

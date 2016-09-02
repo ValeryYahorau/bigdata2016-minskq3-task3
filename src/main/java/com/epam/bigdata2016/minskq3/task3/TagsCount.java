@@ -41,10 +41,13 @@ public class TagsCount {
         }
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-
             String line = value.toString();
+
+            //check if line contains digits because first line containts only words with params names
             if (containsDigit(line)) {
                 String[] params = line.split("\\s+");
+
+                //tags on second position in line
                 String[] tags = params[1].toUpperCase().split(",");
                 for (String currentTag : tags) {
                     if (!stopWords.contains(currentTag)) {
@@ -77,11 +80,9 @@ public class TagsCount {
                     }
                 }
             }
-
             return containsDigit;
         }
     }
-
 
     public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         private IntWritable result = new IntWritable();
@@ -94,14 +95,13 @@ public class TagsCount {
             result.set(sum);
             context.write(key, result);
         }
-
     }
 
     public static void main(String[] args) throws Exception {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test2.txt", "/Users/valeryyegorov/Downloads/test22.txt"};
+        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/testin1.txt", "/Users/valeryyegorov/Downloads/testout1.txt"};
 
         if (otherArgs.length < 2) {
             System.err.println("Usage: tagscount <in> <out> [<in>...]");
