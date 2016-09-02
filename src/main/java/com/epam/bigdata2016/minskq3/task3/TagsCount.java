@@ -101,7 +101,7 @@ public class TagsCount {
 
         Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
-        //otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test2.txt", "/Users/valeryyegorov/Downloads/test22.txt"};
+        otherArgs = new String[]{"/Users/valeryyegorov/Downloads/test2.txt", "/Users/valeryyegorov/Downloads/test22.txt"};
 
         if (otherArgs.length < 2) {
             System.err.println("Usage: tagscount <in> <out> [<in>...]");

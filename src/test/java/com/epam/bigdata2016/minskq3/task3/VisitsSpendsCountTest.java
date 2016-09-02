@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mrunit.mapreduce.MapDriver;
@@ -40,9 +39,9 @@ public class VisitsSpendsCountTest {
         mapDriver.withInput(new LongWritable(), new Text(input1));
         mapDriver.withInput(new LongWritable(), new Text(input2));
         mapDriver.withInput(new LongWritable(), new Text(input3));
-        mapDriver.withOutput(new Text(ip1), new VisitSpendComparable(1,254));
-        mapDriver.withOutput(new Text(ip1), new VisitSpendComparable(1,254));
-        mapDriver.withOutput(new Text(ip2), new VisitSpendComparable(1,254));
+        mapDriver.withOutput(new Text(ip1), new VisitSpendComparable(1, 254));
+        mapDriver.withOutput(new Text(ip1), new VisitSpendComparable(1, 254));
+        mapDriver.withOutput(new Text(ip2), new VisitSpendComparable(1, 254));
 
         mapDriver.runTest();
     }
@@ -50,16 +49,16 @@ public class VisitsSpendsCountTest {
     @Test
     public void testReducer() throws IOException {
         List<VisitSpendComparable> values1 = new ArrayList<VisitSpendComparable>();
-        values1.add(new VisitSpendComparable(1,254));
-        values1.add(new VisitSpendComparable(1,254));
+        values1.add(new VisitSpendComparable(1, 254));
+        values1.add(new VisitSpendComparable(1, 254));
         reduceDriver.withInput(new Text(ip1), values1);
 
         List<VisitSpendComparable> values2 = new ArrayList<VisitSpendComparable>();
-        values2.add(new VisitSpendComparable(1,254));
+        values2.add(new VisitSpendComparable(1, 254));
         reduceDriver.withInput(new Text(ip2), values2);
 
-        reduceDriver.withOutput(new Text(ip1), new VisitSpendComparable(2,508));
-        reduceDriver.withOutput(new Text(ip2), new VisitSpendComparable(1,254));
+        reduceDriver.withOutput(new Text(ip1), new VisitSpendComparable(2, 508));
+        reduceDriver.withOutput(new Text(ip2), new VisitSpendComparable(1, 254));
         reduceDriver.runTest();
     }
 
